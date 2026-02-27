@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Box, CircularProgress } from "@mui/material";
 
-const ProtectedRoute = ({ children, requireAdmin = false }) => {
+const ProtectedRoute = ({ children, requireAdmin = false, requireCustomer = false, redirectTo = "/login" }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -22,11 +22,15 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   if (requireAdmin && user.role !== "admin") {
     return <Navigate to="/login" replace />;
+  }
+
+  if (requireCustomer && user.role !== "student") {
+    return <Navigate to="/customer-login" replace />;
   }
 
   return children;

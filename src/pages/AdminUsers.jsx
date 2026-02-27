@@ -8,6 +8,7 @@ import {
   Button,
   Fab,
   Alert,
+  Snackbar,
   CircularProgress,
 } from "@mui/material";
 import { Add, Logout, ArrowBack } from "@mui/icons-material";
@@ -117,11 +118,20 @@ const AdminUsers = () => {
           Users
         </Typography>
 
-        {error && (
-          <Alert severity="error" onClose={() => setError("")} sx={{ mb: 3 }}>
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError("")}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setError("")}
+            severity="error"
+            sx={{ width: "100%", borderRadius: "8px" }}
+          >
             {error}
           </Alert>
-        )}
+        </Snackbar>
 
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>

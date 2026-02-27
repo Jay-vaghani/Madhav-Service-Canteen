@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { useCart } from "../context/CartContext";
 
 const ItemCard = ({ item }) => {
@@ -9,16 +10,21 @@ const ItemCard = ({ item }) => {
     <Paper
       elevation={0}
       sx={{
-        borderRadius: "12px",
+        borderRadius: "16px",
         overflow: "hidden",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+        border: "1px solid rgba(0, 0, 0, 0.06)",
+        background: "#ffffff",
         display: "flex",
         flexDirection: "column",
-        transition: "transform 0.2s",
-        "&:active": {
-          transform: "scale(0.98)",
-        },
+        transition: "all 0.2s ease",
         height: "100%",
+        "&:hover": {
+          boxShadow: "0 12px 24px rgba(0, 0, 0, 0.06)",
+          transform: "translateY(-4px)",
+        },
+        "&:active": {
+          transform: "translateY(0)",
+        },
       }}
       onClick={() => addToCart(item)}
     >
@@ -27,15 +33,15 @@ const ItemCard = ({ item }) => {
         src={item.imageUrl || item.image}
         alt={item.name || item.title}
         sx={{
-          height: 180,
+          height: 160,
           width: "100%",
           objectFit: "cover",
-          backgroundColor: "#eee",
+          backgroundColor: "#f8f9fa",
         }}
       />
       <Box
         sx={{
-          padding: "1rem",
+          padding: "1.25rem",
           flex: 1,
           display: "flex",
           flexDirection: "column",
@@ -43,27 +49,29 @@ const ItemCard = ({ item }) => {
       >
         <h3
           style={{
-            fontFamily: '"Playfair Display", serif',
-            fontSize: "1.1rem",
-            marginBottom: "0.2rem",
-            fontWeight: 600,
+            fontFamily: '"Inter", sans-serif',
+            fontSize: "1.05rem",
+            marginBottom: "0.25rem",
+            fontWeight: 700,
             marginTop: 0,
-            color: "#1b1b1b",
+            color: "#0f172a",
+            lineHeight: 1.3,
           }}
         >
           {item.name || item.title}
         </h3>
         <p
           style={{
-            fontSize: "0.8rem",
-            color: "#666",
+            fontSize: "0.85rem",
+            color: "#64748b",
             marginBottom: "1rem",
-            lineHeight: 1.4,
+            lineHeight: 1.5,
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             margin: "0 0 1rem 0",
+            flex: 1,
           }}
         >
           {item.description || item.desc}
@@ -78,33 +86,29 @@ const ItemCard = ({ item }) => {
         >
           <span
             style={{
-              fontWeight: 700,
-              color: "#1b1b1b",
+              fontWeight: 800,
+              color: "#0f172a",
+              fontSize: "1.1rem",
             }}
           >
-            ₹{item.price.toFixed(2)}
+            ₹{(item.price || 0).toFixed(2)}
           </span>
-          <button
-            style={{
-              backgroundColor: "#1b1b1b",
-              color: "#d4af37",
-              border: "none",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.2rem",
-              cursor: "pointer",
+          <IconButton
+            size="small"
+            sx={{
+              backgroundColor: "#2d68fe",
+              color: "#ffffff",
+              "&:hover": {
+                backgroundColor: "#2251cd",
+              },
             }}
             onClick={(e) => {
               e.stopPropagation();
               addToCart(item);
             }}
           >
-            +
-          </button>
+            <AddIcon fontSize="small" />
+          </IconButton>
         </Box>
       </Box>
     </Paper>

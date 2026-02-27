@@ -11,6 +11,7 @@ import {
   InputAdornment,
   Autocomplete,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import { CurrencyRupeeRounded, Image } from "@mui/icons-material";
 import { compressImage } from "../../utils/imageCompression";
@@ -136,11 +137,21 @@ const MenuItemForm = ({
       <DialogTitle>{item ? "Edit Menu Item" : "Create Menu Item"}</DialogTitle>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <DialogContent>
-          {imageError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+          <Snackbar
+            open={!!imageError}
+            autoHideDuration={6000}
+            onClose={() => setImageError("")}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
+          >
+            <Alert
+              onClose={() => setImageError("")}
+              severity="error"
+              sx={{ width: "100%", borderRadius: "8px" }}
+            >
               {imageError}
             </Alert>
-          )}
+          </Snackbar>
 
           <Controller
             name="name"

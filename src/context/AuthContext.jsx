@@ -28,6 +28,18 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const customerLogin = async (phone) => {
+    const data = await authService.customerLogin(phone);
+    setUser(data.user);
+    return data;
+  };
+
+  const customerRegister = async (name, email, phone) => {
+    const data = await authService.customerRegister(name, email, phone);
+    setUser(data.user);
+    return data;
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -36,6 +48,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    customerLogin,
+    customerRegister,
     logout,
     isAuthenticated: !!user,
     isAdmin: user?.role === "admin",

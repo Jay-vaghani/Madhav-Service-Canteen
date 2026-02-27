@@ -49,9 +49,9 @@ const MenuItemsList = ({ items, onEdit, onDelete, onToggleAvailability }) => {
               <TableCell>
                 <strong>Category</strong>
               </TableCell>
-              <TableCell>
+              {/* <TableCell>
                 <strong>Description</strong>
-              </TableCell>
+              </TableCell> */}
               <TableCell align="right">
                 <strong>Price</strong>
               </TableCell>
@@ -83,7 +83,7 @@ const MenuItemsList = ({ items, onEdit, onDelete, onToggleAvailability }) => {
                     sx={{ textTransform: "capitalize" }}
                   />
                 </TableCell>
-                <TableCell sx={{ maxWidth: 300 }}>{item.description}</TableCell>
+                {/* <TableCell sx={{ maxWidth: 300 }}>{item.description}</TableCell> */}
                 <TableCell align="right">₨. {item.price.toFixed(2)}</TableCell>
                 <TableCell align="center">
                   <Box

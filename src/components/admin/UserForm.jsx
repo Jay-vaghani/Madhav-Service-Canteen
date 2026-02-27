@@ -8,6 +8,7 @@ import {
   TextField,
   Button,
   Alert,
+  Snackbar,
 } from "@mui/material";
 
 const UserForm = ({ open, onClose, onSubmit, user = null }) => {
@@ -62,11 +63,21 @@ const UserForm = ({ open, onClose, onSubmit, user = null }) => {
       <DialogTitle>{user ? "Edit User" : "Create Order Manager"}</DialogTitle>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <DialogContent>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+          <Snackbar
+            open={!!error}
+            autoHideDuration={6000}
+            onClose={() => setError("")}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
+          >
+            <Alert
+              onClose={() => setError("")}
+              severity="error"
+              sx={{ width: "100%", borderRadius: "8px" }}
+            >
               {error}
             </Alert>
-          )}
+          </Snackbar>
 
           <Controller
             name="username"

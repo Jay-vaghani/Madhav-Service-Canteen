@@ -9,6 +9,7 @@ import {
   Button,
   Typography,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import { LoginOutlined } from "@mui/icons-material";
 
@@ -71,11 +72,20 @@ const Login = () => {
             </Typography>
           </Box>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+          <Snackbar
+            open={!!error}
+            autoHideDuration={6000}
+            onClose={() => setError("")}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
+            <Alert
+              onClose={() => setError("")}
+              severity="error"
+              sx={{ width: "100%", borderRadius: "8px" }}
+            >
               {error}
             </Alert>
-          )}
+          </Snackbar>
 
           <form onSubmit={handleSubmit}>
             <TextField

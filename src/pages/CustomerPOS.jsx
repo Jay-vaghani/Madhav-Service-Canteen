@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, CircularProgress, Alert } from "@mui/material";
+import { Box, Grid, CircularProgress, Alert, Snackbar } from "@mui/material";
 import Header from "../components/Header";
 import CategoryList from "../components/CategoryList";
 import ItemCard from "../components/ItemCard";
@@ -58,9 +58,10 @@ const CustomerPOS = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
+          backgroundColor: "#f8f9fa",
         }}
       >
-        <CircularProgress size={60} />
+        <CircularProgress size={60} sx={{ color: "#2d68fe" }} />
       </Box>
     );
   }
@@ -81,18 +82,29 @@ const CustomerPOS = () => {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          borderRight: "1px solid rgba(27, 27, 27, 0.1)",
+          borderRight: "1px solid rgba(0, 0, 0, 0.04)",
           position: "relative",
           overflow: "hidden",
+          backgroundColor: "#ffffff",
         }}
       >
         <Header />
-        {error && (
-          <Alert severity="error" sx={{ m: 2 }}>
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError("")}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setError("")}
+            severity="error"
+            sx={{ width: "100%", borderRadius: "8px" }}
+          >
             {error}
           </Alert>
-        )}
+        </Snackbar>
         <CategoryList
+
           categories={categories}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
@@ -101,14 +113,14 @@ const CustomerPOS = () => {
           sx={{
             flex: 1,
             overflowY: "auto",
-            padding: "2rem",
-            backgroundColor: "#f5f5f7",
+            padding: { xs: "1rem", md: "2rem" },
+            backgroundColor: "#f8f9fa",
             paddingBottom: { xs: "100px", md: "4rem" },
           }}
         >
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             {filteredItems.map((item) => (
-              <Grid key={item._id} size={{ xs: 12, sm: 6, lg: 3, xl: 2 }}>
+              <Grid key={item._id} size={{ xs: 12, sm: 6, lg: 3 }}>
                 <ItemCard item={item} />
               </Grid>
             ))}

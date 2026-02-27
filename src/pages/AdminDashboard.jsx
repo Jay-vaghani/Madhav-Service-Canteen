@@ -10,6 +10,7 @@ import {
   Tab,
   Fab,
   Alert,
+  Snackbar,
   CircularProgress,
   TextField,
   InputAdornment,
@@ -20,6 +21,7 @@ import { useAuth } from "../context/AuthContext";
 import { menuService } from "../services/menuService";
 import MenuItemsList from "../components/admin/MenuItemsList";
 import MenuItemForm from "../components/admin/MenuItemForm";
+import OrderManagement from "../components/admin/OrderManagement";
 
 const AdminDashboard = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -115,10 +117,10 @@ const AdminDashboard = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f5f5f7" }}>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ borderRadius: 0 }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-            Admin Panel - {user?.username}
+            {user?.username.toUpperCase()}
           </Typography>
           <Button
             color="inherit"
@@ -137,53 +139,71 @@ const AdminDashboard = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
           <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
             <Tab label="Menu Items" />
+            <Tab label="Orders" />
           </Tabs>
         </Box>
 
-        {error && (
-          <Alert severity="error" onClose={() => setError("")} sx={{ mb: 3 }}>
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError("")}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setError("")}
+            severity="error"
+            sx={{ width: "100%", borderRadius: "8px" }}
+          >
             {error}
           </Alert>
-        )}
+        </Snackbar>
 
-        <TextField
-          fullWidth
-          placeholder="Search menu items by name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ mb: 3 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-        />
+        {tabValue === 0 && (
+          <>
+            <TextField
+              fullWidth
+              placeholder="Search menu items by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ mb: 3 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <MenuItemsList
-            items={menuItems.filter((item) =>
-              item.name.toLowerCase().includes(searchQuery.toLowerCase())
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <MenuItemsList
+                items={menuItems.filter((item) =>
+                  item.name.toLowerCase().includes(searchQuery.toLowerCase())
+                )}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleAvailability={handleToggleAvailability}
+              />
             )}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onToggleAvailability={handleToggleAvailability}
-          />
+
+            <Fab
+              color="primary"
+              aria-label="add"
+              sx={{ position: "fixed", bottom: 32, right: 32 }}
+              onClick={handleAddNew}
+            >
+              <Add />
+            </Fab>
+          </>
         )}
 
-        <Fab
-          color="primary"
-          aria-label="add"
-          sx={{ position: "fixed", bottom: 32, right: 32 }}
-          onClick={handleAddNew}
-        >
-          <Add />
-        </Fab>
+        {tabValue === 1 && (
+          <OrderManagement isAdmin={true} />
+        )}
 
         <MenuItemForm
           open={formOpen}
