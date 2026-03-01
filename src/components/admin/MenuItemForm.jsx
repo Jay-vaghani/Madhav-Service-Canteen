@@ -33,6 +33,7 @@ const MenuItemForm = ({
   const [imageError, setImageError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [categoryInputValue, setCategoryInputValue] = useState("");
 
   const {
     control,
@@ -70,6 +71,7 @@ const MenuItemForm = ({
       }
       setSelectedFile(null);
       setImageError("");
+      setCategoryInputValue("");
     }
   }, [open, item, reset]);
 
@@ -135,6 +137,7 @@ const MenuItemForm = ({
     setImagePreview("");
     setSelectedFile(null);
     setImageError("");
+    setCategoryInputValue("");
     onClose();
   };
 
@@ -188,7 +191,24 @@ const MenuItemForm = ({
                 freeSolo
                 options={categories}
                 value={Array.isArray(value) ? value : []}
-                onChange={(e, newValue) => onChange(newValue)}
+                inputValue={categoryInputValue}
+                onInputChange={(e, newInputValue) => {
+                  setCategoryInputValue(newInputValue);
+                }}
+                onChange={(e, newValue) => {
+                  onChange(newValue);
+                  setCategoryInputValue("");
+                }}
+                onBlur={() => {
+                  if (categoryInputValue.trim()) {
+                    const newCat = categoryInputValue.trim();
+                    const currentValues = Array.isArray(value) ? value : [];
+                    if (!currentValues.includes(newCat)) {
+                      onChange([...currentValues, newCat]);
+                    }
+                    setCategoryInputValue("");
+                  }
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
