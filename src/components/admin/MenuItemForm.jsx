@@ -12,8 +12,14 @@ import {
   Autocomplete,
   Alert,
   Snackbar,
+  Checkbox,
 } from "@mui/material";
-import { CurrencyRupeeRounded, Image } from "@mui/icons-material";
+import {
+  CurrencyRupeeRounded,
+  Image,
+  CheckBoxOutlineBlank,
+  CheckBox as CheckBoxIcon
+} from "@mui/icons-material";
 import { compressImage } from "../../utils/imageCompression";
 
 const MenuItemForm = ({
@@ -180,9 +186,24 @@ const MenuItemForm = ({
               <Autocomplete
                 multiple
                 freeSolo
+                disableCloseOnSelect
                 options={categories}
                 value={Array.isArray(value) ? value : []}
                 onChange={(e, newValue) => onChange(newValue)}
+                renderOption={(props, option, { selected }) => {
+                  const { key, ...optionProps } = props;
+                  return (
+                    <li key={key} {...optionProps}>
+                      <Checkbox
+                        icon={<CheckBoxOutlineBlank fontSize="small" />}
+                        checkedIcon={<CheckBoxIcon fontSize="small" />}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                      />
+                      {option}
+                    </li>
+                  );
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
