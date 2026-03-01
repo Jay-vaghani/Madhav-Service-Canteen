@@ -36,7 +36,7 @@ const MenuItemForm = ({
   } = useForm({
     defaultValues: {
       name: "",
-      category: "",
+      category: [],
       price: "",
       description: "",
     },
@@ -48,7 +48,7 @@ const MenuItemForm = ({
       if (item) {
         reset({
           name: item.name || "",
-          category: item.category || "",
+          category: Array.isArray(item.category) ? item.category : (item.category ? [item.category] : []),
           price: item.price || "",
           description: item.description || "",
         });
@@ -56,7 +56,7 @@ const MenuItemForm = ({
       } else {
         reset({
           name: "",
-          category: "",
+          category: [],
           price: "",
           description: "",
         });
@@ -122,7 +122,7 @@ const MenuItemForm = ({
   const handleClose = () => {
     reset({
       name: "",
-      category: "",
+      category: [],
       price: "",
       description: "",
     });
@@ -172,22 +172,25 @@ const MenuItemForm = ({
           <Controller
             name="category"
             control={control}
-            rules={{ required: "Category is required" }}
+            rules={{
+              required: "At least one category is required",
+              validate: v => (Array.isArray(v) && v.length > 0) || "At least one category is required"
+            }}
             render={({ field: { onChange, value } }) => (
               <Autocomplete
+                multiple
                 freeSolo
                 options={categories}
-                value={value}
+                value={Array.isArray(value) ? value : []}
                 onChange={(e, newValue) => onChange(newValue)}
-                onInputChange={(e, newValue) => onChange(newValue)}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Category"
+                    label="Categories"
                     error={!!errors.category}
                     helperText={
                       errors.category?.message ||
-                      "Select or type a new category"
+                      "Select or type new categories, hit enter"
                     }
                     sx={{ mb: 2 }}
                   />

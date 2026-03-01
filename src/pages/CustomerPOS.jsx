@@ -48,7 +48,11 @@ const CustomerPOS = () => {
   const filteredItems =
     activeCategory === "all"
       ? menuItems
-      : menuItems.filter((item) => item.category === activeCategory);
+      : menuItems.filter((item) =>
+        Array.isArray(item.category)
+          ? item.category.includes(activeCategory)
+          : item.category === activeCategory
+      );
 
   if (loading) {
     return (

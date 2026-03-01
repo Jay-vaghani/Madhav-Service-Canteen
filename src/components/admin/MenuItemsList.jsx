@@ -76,12 +76,26 @@ const MenuItemsList = ({ items, onEdit, onDelete, onToggleAvailability }) => {
                 </TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={item.category}
-                    size="small"
-                    color="primary"
-                    sx={{ textTransform: "capitalize" }}
-                  />
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {Array.isArray(item.category) ? (
+                      item.category.map((cat, idx) => (
+                        <Chip
+                          key={idx}
+                          label={cat}
+                          size="small"
+                          color="primary"
+                          sx={{ textTransform: "capitalize" }}
+                        />
+                      ))
+                    ) : (
+                      <Chip
+                        label={item.category}
+                        size="small"
+                        color="primary"
+                        sx={{ textTransform: "capitalize" }}
+                      />
+                    )}
+                  </Box>
                 </TableCell>
                 {/* <TableCell sx={{ maxWidth: 300 }}>{item.description}</TableCell> */}
                 <TableCell align="right">₨. {item.price.toFixed(2)}</TableCell>
