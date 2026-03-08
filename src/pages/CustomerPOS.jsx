@@ -1,21 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, CircularProgress, Alert, Snackbar } from "@mui/material";
+import {
+  Box,
+  Grid,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  TextField,
+  InputAdornment,
+  useMediaQuery,
+} from "@mui/material";
+import { Search } from "@mui/icons-material";
 import Header from "../components/Header";
 import CategoryList from "../components/CategoryList";
 import ItemCard from "../components/ItemCard";
-import CartSidebar from "../components/CartSidebar";
+import CartView from "../components/CartView";
+import OrdersView from "../components/OrdersView";
+import BottomTabBar from "../components/BottomTabBar";
 import { menuService } from "../services/menuService";
 
 const CustomerPOS = () => {
+  const [activeTab, setActiveTab] = useState("menu");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const isMobile = useMediaQuery("(max-width:900px)");
 
   useEffect(() => {
     fetchData();
   }, []);
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -24,8 +40,6 @@ const CustomerPOS = () => {
         menuService.getAllMenuItems(),
         menuService.getCategories(),
       ]);
-
-      // Handle different response structures
       const items = Array.isArray(itemsResponse)
         ? itemsResponse
         : itemsResponse?.items || itemsResponse?.data || [];
@@ -33,7 +47,6 @@ const CustomerPOS = () => {
         ? catsResponse
         : catsResponse?.categories || catsResponse?.data || [];
 
-      // Filter to only show available items
       const availableItems = items.filter((item) => item.isAvailable);
       setMenuItems(availableItems);
       setCategories(["all", ...cats]);
@@ -45,14 +58,18 @@ const CustomerPOS = () => {
     }
   };
 
-  const filteredItems =
-    activeCategory === "all"
-      ? menuItems
-      : menuItems.filter((item) =>
-        Array.isArray(item.category)
-          ? item.category.includes(activeCategory)
-          : item.category === activeCategory
-      );
+  const filteredItems = menuItems.filter((item) => {
+    const matchesCategory =
+      activeCategory === "all" ||
+      (Array.isArray(item.category)
+        ? item.category.includes(activeCategory)
+        : item.category === activeCategory);
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.description &&
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
 
   if (loading) {
     return (
@@ -70,24 +87,116 @@ const CustomerPOS = () => {
     );
   }
 
+  /* ─────────────────────────────────────────
+     MOBILE LAYOUT
+  ───────────────────────────────────────── */
+  if (isMobile) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden" }}>
+        {/* Page Content */}
+        <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+          {/* MENU TAB */}
+          {activeTab === "menu" && (
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <Header />
+              <Snackbar
+                open={!!error}
+                autoHideDuration={6000}
+                onClose={() => setError("")}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              >
+                <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%", borderRadius: "8px" }}>
+                  {error}
+                </Alert>
+              </Snackbar>
+              {/* Search */}
+              <Box sx={{ px: "1rem", pt: 1.5, pb: 0 }}>
+                <TextField
+                  fullWidth
+                  placeholder="Search menu items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      backgroundColor: "#f8f9fa",
+                      "& fieldset": { borderColor: "rgba(0,0,0,0.08)" },
+                      "&:hover fieldset": { borderColor: "primary.main" },
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: "text.secondary", fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+              <CategoryList
+                categories={categories}
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
+              />
+              <Box
+                sx={{
+                  flex: 1,
+                  overflowY: "auto",
+                  px: "0.75rem",
+                  pt: "0.75rem",
+                  pb: "80px", // room for tab bar
+                  backgroundColor: "#f8f9fa",
+                }}
+              >
+                <Grid container spacing={1.5}>
+                  {filteredItems.map((item) => (
+                    <Grid key={item._id} size={{ xs: 6 }}>
+                      <ItemCard item={item} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            </Box>
+          )}
+
+          {/* CART TAB */}
+          {activeTab === "cart" && (
+            <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", pb: "64px" }}>
+              <CartView />
+            </Box>
+          )}
+
+          {/* ORDERS TAB */}
+          {activeTab === "orders" && (
+            <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", pb: "64px" }}>
+              <OrdersView />
+            </Box>
+          )}
+        </Box>
+
+        {/* iOS-style Bottom Tab Bar */}
+        <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      </Box>
+    );
+  }
+
+  /* ─────────────────────────────────────────
+     DESKTOP LAYOUT
+  ───────────────────────────────────────── */
   return (
-    <Box
-      sx={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden",
-        flexDirection: { xs: "column", md: "row" },
-      }}
-    >
-      {/* LEFT: MENU SECTION */}
+    <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden" }}>
+      {/* Left Nav Rail */}
+      <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* Center: Menu + Header */}
       <Box
         sx={{
           flex: 1,
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          borderRight: "1px solid rgba(0, 0, 0, 0.04)",
-          position: "relative",
           overflow: "hidden",
           backgroundColor: "#ffffff",
         }}
@@ -99,41 +208,69 @@ const CustomerPOS = () => {
           onClose={() => setError("")}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          <Alert
-            onClose={() => setError("")}
-            severity="error"
-            sx={{ width: "100%", borderRadius: "8px" }}
-          >
+          <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%", borderRadius: "8px" }}>
             {error}
           </Alert>
         </Snackbar>
-        <CategoryList
 
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
-        <Box
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            padding: { xs: "1rem", md: "2rem" },
-            backgroundColor: "#f8f9fa",
-            paddingBottom: { xs: "100px", md: "4rem" },
-          }}
-        >
-          <Grid container spacing={2}>
-            {filteredItems.map((item) => (
-              <Grid key={item._id} size={{ xs: 12, sm: 6, lg: 3 }}>
-                <ItemCard item={item} />
+        {/* Content area — shows menu or cart depending on tab */}
+        {activeTab === "cart" ? (
+          <Box sx={{ flex: 1, overflow: "hidden" }}>
+            <CartView />
+          </Box>
+        ) : activeTab === "orders" ? (
+          <Box sx={{ flex: 1, overflow: "hidden" }}>
+            <OrdersView />
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ px: "2rem", pt: 2 }}>
+              <TextField
+                fullWidth
+                placeholder="Search menu items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    backgroundColor: "#f8f9fa",
+                    "& fieldset": { borderColor: "rgba(0,0,0,0.08)" },
+                    "&:hover fieldset": { borderColor: "primary.main" },
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+            <CategoryList
+              categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "1.5rem 2rem",
+                backgroundColor: "#f8f9fa",
+              }}
+            >
+              <Grid container spacing={2}>
+                {filteredItems.map((item) => (
+                  <Grid key={item._id} size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
+                    <ItemCard item={item} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        </Box>
+            </Box>
+          </>
+        )}
       </Box>
-
-      {/* RIGHT: CART SECTION */}
-      <CartSidebar />
     </Box>
   );
 };

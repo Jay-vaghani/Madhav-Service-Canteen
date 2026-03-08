@@ -140,6 +140,7 @@ const CustomerLogin = () => {
 
                         <TextField
                             fullWidth
+                            type="tel"
                             label="Phone Number"
                             variant="outlined"
                             value={phone}

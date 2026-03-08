@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { LogoutOutlined, ReceiptLong } from '@mui/icons-material';
+import { LogoutOutlined } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,30 +46,6 @@ const Header = () => {
 
       {user && (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => navigate('/my-orders')}
-            sx={{
-              borderRadius: '10px',
-              textTransform: 'none',
-              fontWeight: 700,
-              padding: { xs: '6px 8px', sm: '6px 16px' },
-              borderColor: '#2d68fe',
-              color: '#2d68fe',
-              minWidth: { xs: '40px', sm: 'auto' },
-              '&:hover': {
-                backgroundColor: 'rgba(45, 104, 254, 0.06)',
-                borderColor: '#2d68fe',
-              },
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <ReceiptLong sx={{ fontSize: { xs: 20, sm: 20 }, mr: { xs: 0, sm: 1 } }} />
-            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>My Orders</Box>
-            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' }, fontSize: '0.75rem' }}>My Orders</Box>
-          </Button>
-
           <Button
             variant="contained"
             size="small"
