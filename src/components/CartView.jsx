@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Typography, Snackbar, Alert } from "@mui/material";
+import { Box, Button, Typography, Snackbar, Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { orderService } from "../services/orderService";
@@ -10,7 +10,13 @@ const CartView = () => {
     const { user } = useAuth();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "warning" });
+    const [dontShowWarning, setDontShowWarning] = useState(() => localStorage.getItem('hideOrderWarning') === 'true');
     const cartItems = Object.values(cart);
+
+    const handleWarningChange = (e) => {
+        setDontShowWarning(e.target.checked);
+        localStorage.setItem('hideOrderWarning', e.target.checked);
+    };
 
     const showSnackbar = (message, severity = "warning") => {
         setSnackbar({ open: true, message, severity });
@@ -181,6 +187,30 @@ const CartView = () => {
 
             {/* Footer */}
             <Box sx={{ p: 2, backgroundColor: "#ffffff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+                {/* Notice Block */}
+                {!dontShowWarning && cartItems.length > 0 && (
+                    <Box sx={{ mb: 2, p: 1.5, backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fde68a" }}>
+                        <Typography fontSize="0.85rem" color="#92400e" fontFamily='"Inter", sans-serif' fontWeight={700} mb={0.5} display="flex" alignItems="center" gap={0.5}>
+                            <span style={{ fontSize: "1rem" }}>⚠️</span> Important Notice
+                        </Typography>
+                        <Typography fontSize="0.75rem" color="#92400e" fontFamily='"Inter", sans-serif' mb={1} lineHeight={1.4}>
+                            Once your order is placed, <strong>modifications</strong> and <strong>cancellations</strong> are not permitted. Please review your items carefully.
+                        </Typography>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    size="small"
+                                    checked={dontShowWarning}
+                                    onChange={handleWarningChange}
+                                    sx={{ color: '#d97706', '&.Mui-checked': { color: '#d97706' }, p: 0.5, py: 0 }}
+                                />
+                            }
+                            label={<Typography fontSize="0.75rem" color="#92400e" fontFamily='"Inter", sans-serif' fontWeight={600}>Don't show this again</Typography>}
+                            sx={{ m: 0 }}
+                        />
+                    </Box>
+                )}
+
                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
                     <Typography fontFamily='"Inter", sans-serif' fontWeight={600} fontSize="1rem" color="#0f172a">Total</Typography>
                     <Typography fontFamily='"Inter", sans-serif' fontWeight={800} fontSize="1.1rem" color="#2d68fe">₹{totalPrice.toFixed(2)}</Typography>

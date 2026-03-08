@@ -36,4 +36,13 @@ export const menuService = {
     const response = await api.patch(`/menu/items/${id}/availability`, { isAvailable });
     return response.data;
   },
+
+  // Bulk availability update — single request, one DB call
+  // Pass ids[] to target specific items, omit to update ALL items
+  bulkUpdateAvailability: async (isAvailable, ids) => {
+    const body = { isAvailable };
+    if (Array.isArray(ids) && ids.length > 0) body.ids = ids;
+    const response = await api.patch('/menu/items/bulk-availability', body);
+    return response.data; // { message, modifiedCount }
+  },
 };

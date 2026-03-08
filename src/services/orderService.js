@@ -55,4 +55,23 @@ export const orderService = {
     const response = await api.get("/orders/my-orders");
     return response.data;
   },
+
+  // ── Server-side Search (Admin/Manager) ──
+
+  /**
+   * Search orders on the backend — handles scale (thousands of orders).
+   * @param {object} params
+   * @param {string} [params.orderNum]  - Sequence suffix after last dash (e.g. "12")
+   * @param {string} [params.customer] - Partial name or phone number
+   * @param {string} [params.status]   - "pending" | "delivered" | "all"
+   */
+  searchOrders: async ({ orderNum = "", customer = "", status = "all" } = {}) => {
+    const qs = new URLSearchParams();
+    if (orderNum.trim()) qs.set("orderNum", orderNum.trim());
+    if (customer.trim()) qs.set("customer", customer.trim());
+    qs.set("status", status);
+    const response = await api.get(`/orders/search?${qs.toString()}`);
+    return response.data;
+  },
 };
+

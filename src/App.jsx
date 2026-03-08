@@ -11,7 +11,6 @@ import CustomerPOS from "./pages/CustomerPOS";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import ManagerDashboard from "./pages/ManagerDashboard";
-import CustomerOrders from "./pages/CustomerOrders";
 
 function App() {
   return (
@@ -27,11 +26,6 @@ function App() {
               <Route path="/" element={
                 <ProtectedRoute requireCustomer redirectTo="/customer-login">
                   <CustomerPOS />
-                </ProtectedRoute>
-              } />
-              <Route path="/my-orders" element={
-                <ProtectedRoute requireCustomer redirectTo="/customer-login">
-                  <CustomerOrders />
                 </ProtectedRoute>
               } />
 
