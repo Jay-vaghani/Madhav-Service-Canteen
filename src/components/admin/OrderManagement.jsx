@@ -136,15 +136,15 @@ const OrderManagement = ({ isAdmin = false }) => {
     const hasSearch = orderSearch.trim() !== "" || customerSearch.trim() !== "";
 
     /* ── base fetch (no search) — used for auto-refresh ─────── */
-    const fetchOrders = useCallback(async () => {
-        setLoading(true);
+    const fetchOrders = useCallback(async (isSilent = false) => {
+        if (!isSilent) setLoading(true);
         try {
             const data = await orderService.getPaidOrders(filter);
             setOrders(data);
         } catch {
-            setSnackbar({ open: true, message: "Failed to load orders", severity: "error" });
+            if (!isSilent) setSnackbar({ open: true, message: "Failed to load orders", severity: "error" });
         } finally {
-            setLoading(false);
+            if (!isSilent) setLoading(false);
         }
     }, [filter]);
 
@@ -168,8 +168,8 @@ const OrderManagement = ({ isAdmin = false }) => {
 
         if (!hasSearch) {
             // Normal mode: fetch immediately + auto-refresh every 15s
-            fetchOrders();
-            intervalRef.current = setInterval(fetchOrders, 15000);
+            fetchOrders(false);
+            intervalRef.current = setInterval(() => fetchOrders(true), 15000);
         } else {
             // Search mode: stop auto-refresh (debounce handles it)
             // results are stale but search is intent-driven
@@ -209,7 +209,7 @@ const OrderManagement = ({ isAdmin = false }) => {
             // Re-sync after short delay
             setTimeout(() => {
                 if (hasSearch) runSearch(orderSearch, customerSearch, filter);
-                else fetchOrders();
+                else fetchOrders(true);
             }, 800);
         } catch (error) {
             setSnackbar({
@@ -474,7 +474,6 @@ const OrderManagement = ({ isAdmin = false }) => {
                                 <TableCell>Time</TableCell>
                                 <TableCell>Status</TableCell>
                                 {isAdmin && filter !== "pending" && <TableCell>Delivered By</TableCell>}
-                                <TableCell align="center">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -483,11 +482,14 @@ const OrderManagement = ({ isAdmin = false }) => {
                                 return (
                                     <TableRow
                                         key={order._id}
+                                        onClick={() => setDetailOrder(order)}
                                         sx={{
+                                            cursor: "pointer",
                                             backgroundColor: isPending ? "#fffbeb" : "#fff",
                                             borderLeft: isPending ? "3px solid #f59e0b" : "3px solid transparent",
-                                            transition: "background 0.15s",
-                                            "&:hover": { backgroundColor: isPending ? "#fef3c7" : "#f8fafc" },
+                                            transition: "background 0.15s, transform 0.1s",
+                                            "&:hover": { backgroundColor: isPending ? "#fef3c7" : "#f1f5f9" },
+                                            "&:active": { transform: "scale(0.995)" },
                                             "&:last-child td": { borderBottom: 0 },
                                             "& td": { py: 2, borderBottom: idx === visibleOrders.length - 1 ? "none" : "1px solid #f1f5f9" },
                                         }}
@@ -560,52 +562,6 @@ const OrderManagement = ({ isAdmin = false }) => {
                                             </TableCell>
                                         )}
 
-                                        {/* Actions */}
-                                        <TableCell align="center">
-                                            <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-                                                <Button
-                                                    size="small"
-                                                    variant="outlined"
-                                                    onClick={() => setDetailOrder(order)}
-                                                    sx={{
-                                                        textTransform: "none",
-                                                        fontSize: "0.75rem",
-                                                        borderRadius: "8px",
-                                                        border: "1px solid #e2e8f0",
-                                                        color: "#475569",
-                                                        fontWeight: 600,
-                                                        "&:hover": { backgroundColor: "#f1f5f9", borderColor: "#cbd5e1" },
-                                                    }}
-                                                >
-                                                    View
-                                                </Button>
-                                                {isPending && (
-                                                    <Button
-                                                        size="small"
-                                                        variant="contained"
-                                                        disabled={deliveringId === order._id}
-                                                        onClick={() => handleDeliver(order._id)}
-                                                        startIcon={
-                                                            deliveringId === order._id
-                                                                ? null
-                                                                : <CheckCircle sx={{ fontSize: "14px !important" }} />
-                                                        }
-                                                        sx={{
-                                                            textTransform: "none",
-                                                            fontSize: "0.75rem",
-                                                            fontWeight: 700,
-                                                            borderRadius: "8px",
-                                                            backgroundColor: "#16a34a",
-                                                            boxShadow: "0 2px 8px rgba(22,163,74,0.3)",
-                                                            "&:hover": { backgroundColor: "#15803d", boxShadow: "0 4px 12px rgba(22,163,74,0.4)" },
-                                                            "&:disabled": { backgroundColor: "#d1fae5", color: "#6ee7b7" },
-                                                        }}
-                                                    >
-                                                        {deliveringId === order._id ? "Saving…" : "Delivered"}
-                                                    </Button>
-                                                )}
-                                            </Box>
-                                        </TableCell>
                                     </TableRow>
                                 );
                             })}

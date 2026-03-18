@@ -30,8 +30,13 @@ export const authService = {
     return response.data;
   },
 
-  // Logout
-  logout: () => {
+  // Logout — notify backend to free device slot (admin), then clear local storage
+  logout: async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Ignore — token may already be expired
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },

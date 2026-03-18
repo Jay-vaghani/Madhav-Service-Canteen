@@ -29,6 +29,7 @@ import { useAuth } from "../context/AuthContext";
 import { menuService } from "../services/menuService";
 import MenuItemsList from "../components/admin/MenuItemsList";
 import OrderManagement from "../components/admin/OrderManagement";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 /* ── Sidebar nav item ─────────────────────────────────────── */
 const NavItem = ({ icon, label, active, compact, onClick }) => (
@@ -185,7 +186,7 @@ const ManagerDashboard = () => {
     finally { setLoading(false); }
   };
 
-  const handleLogout = () => { logout(); navigate("/login"); };
+  const handleLogout = async () => { await logout(); navigate("/login"); };
 
   const handleToggleAvailability = async (id, isAvailable) => {
     try {
@@ -226,7 +227,7 @@ const ManagerDashboard = () => {
   const sidebarProps = { activeSection, setActiveSection, handleLogout, availableCount, menuItemsLength: menuItems.length };
 
   /* ── Menu section (no Add/Edit/Delete — manager can only toggle) ── */
-  const MenuSection = () => (
+  const renderMenuSection = () => (
     <>
       {/* Search + bulk toggle */}
       <Box sx={{ display: "flex", gap: { xs: 1, sm: 2 }, mb: 2, alignItems: "center", backgroundColor: "#fff", p: { xs: 1.5, sm: 2 }, borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", flexWrap: { xs: "wrap", sm: "nowrap" } }}>
@@ -297,7 +298,7 @@ const ManagerDashboard = () => {
     </>
   );
 
-  const OrdersSection = () => (
+  const renderOrdersSection = () => (
     <Box sx={{ mb: isMobile ? 10 : 0 }}>
       <OrderManagement isAdmin={false} />
     </Box>
@@ -320,13 +321,16 @@ const ManagerDashboard = () => {
             </Box>
             <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "0.95rem" }}>{titleMap[activeSection]}</Typography>
           </Box>
-          {activeSection === "menu" && (
-            <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem" }}>{availableCount}/{menuItems.length}</Typography>
-          )}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            {activeSection === "menu" && (
+              <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", display: { xs: 'none', sm: 'block' } }}>{availableCount}/{menuItems.length}</Typography>
+            )}
+            <LanguageSwitcher themeMode="dark" />
+          </Box>
         </Box>
         <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
-          {activeSection === "menu" && <MenuSection />}
-          {activeSection === "orders" && <OrdersSection />}
+          {activeSection === "menu" && renderMenuSection()}
+          {activeSection === "orders" && renderOrdersSection()}
         </Box>
         <BottomNav activeSection={activeSection} setActiveSection={setActiveSection} />
         <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError("")} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
@@ -349,10 +353,11 @@ const ManagerDashboard = () => {
               <Typography sx={{ fontWeight: 800, fontSize: "1.1rem", color: "#0f172a" }}>{titleMap[activeSection]}</Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>{subtitleMap[activeSection]}</Typography>
             </Box>
+            <LanguageSwitcher themeMode="light" />
           </Box>
           <Box sx={{ flex: 1, overflowY: "auto", p: 2.5 }}>
-            {activeSection === "menu" && <MenuSection />}
-            {activeSection === "orders" && <OrdersSection />}
+            {activeSection === "menu" && renderMenuSection()}
+            {activeSection === "orders" && renderOrdersSection()}
           </Box>
         </Box>
         <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError("")} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
@@ -378,10 +383,11 @@ const ManagerDashboard = () => {
               {subtitleMap[activeSection]}
             </Typography>
           </Box>
+          <LanguageSwitcher themeMode="light" />
         </Box>
         <Box sx={{ flex: 1, overflowY: "auto", p: 4 }}>
-          {activeSection === "menu" && <MenuSection />}
-          {activeSection === "orders" && <OrdersSection />}
+          {activeSection === "menu" && renderMenuSection()}
+          {activeSection === "orders" && renderOrdersSection()}
         </Box>
       </Box>
       <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError("")} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>

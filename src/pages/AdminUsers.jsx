@@ -28,6 +28,7 @@ import { useAuth } from "../context/AuthContext";
 import { userService } from "../services/userService";
 import UsersList from "../components/admin/UsersList";
 import UserForm from "../components/admin/UserForm";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 /* ── Sidebar nav item (matches AdminDashboard exactly) ──────── */
 const SidebarNavItem = ({ icon, label, active, compact, onClick }) => (
@@ -169,7 +170,7 @@ const AdminUsers = () => {
     finally { setLoading(false); }
   };
 
-  const handleLogout = () => { logout(); navigate("/login"); };
+  const handleLogout = async () => { await logout(); navigate("/login"); };
 
   const handleCreateOrUpdate = async (data) => {
     try {
@@ -199,7 +200,7 @@ const AdminUsers = () => {
   const managerCount = users.filter((u) => u.role === "manager").length;
 
   /* ── Shared content ─────────────────────────────────────── */
-  const Content = () => (
+  const renderContent = () => (
     <>
       {/* Search + stats row */}
       <Box
@@ -290,12 +291,15 @@ const AdminUsers = () => {
             </Box>
             <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "0.95rem" }}>Manage Users</Typography>
           </Box>
-          <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem" }}>
-            {users.length} total
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", display: { xs: 'none', sm: 'block' } }}>
+              {users.length} total
+            </Typography>
+            <LanguageSwitcher themeMode="dark" />
+          </Box>
         </Box>
         <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
-          <Content />
+          {renderContent()}
         </Box>
         <Fab size="medium" onClick={() => { setEditingUser(null); setFormOpen(true); }}
           sx={{ position: "fixed", bottom: 80, right: 16, backgroundColor: "#2563eb", boxShadow: "0 4px 16px rgba(37,99,235,0.4)", "&:hover": { backgroundColor: "#1d4ed8" } }}>
@@ -320,13 +324,16 @@ const AdminUsers = () => {
               <Typography sx={{ fontWeight: 800, fontSize: "1.1rem", color: "#0f172a" }}>Manage Users</Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>{users.length} total · {adminCount} admin · {managerCount} manager</Typography>
             </Box>
-            <Button variant="contained" size="small" startIcon={<Add />} onClick={() => { setEditingUser(null); setFormOpen(true); }}
-              sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", "&:hover": { backgroundColor: "#1d4ed8" } }}>
-              Add
-            </Button>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <LanguageSwitcher themeMode="light" />
+              <Button variant="contained" size="small" startIcon={<Add />} onClick={() => { setEditingUser(null); setFormOpen(true); }}
+                sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", "&:hover": { backgroundColor: "#1d4ed8" } }}>
+                Add
+              </Button>
+            </Box>
           </Box>
           <Box sx={{ flex: 1, overflowY: "auto", p: 2.5 }}>
-            <Content />
+            {renderContent()}
           </Box>
         </Box>
         {sharedDialogs}
@@ -351,13 +358,16 @@ const AdminUsers = () => {
               {users.length} total · {adminCount} admin{adminCount !== 1 ? "s" : ""} · {managerCount} manager{managerCount !== 1 ? "s" : ""}
             </Typography>
           </Box>
-          <Button variant="contained" startIcon={<Add />} onClick={() => { setEditingUser(null); setFormOpen(true); }}
-            sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", boxShadow: "0 4px 14px rgba(37,99,235,0.3)", "&:hover": { backgroundColor: "#1d4ed8" } }}>
-            Add User
-          </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <LanguageSwitcher themeMode="light" />
+            <Button variant="contained" startIcon={<Add />} onClick={() => { setEditingUser(null); setFormOpen(true); }}
+              sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", boxShadow: "0 4px 14px rgba(37,99,235,0.3)", "&:hover": { backgroundColor: "#1d4ed8" } }}>
+              Add User
+            </Button>
+          </Box>
         </Box>
         <Box sx={{ flex: 1, overflowY: "auto", p: 4 }}>
-          <Content />
+          {renderContent()}
         </Box>
       </Box>
       {sharedDialogs}

@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import { Box, Button, Snackbar, Alert } from "@mui/material";
+import { Box, Button, Snackbar, Alert, Checkbox, FormControlLabel } from "@mui/material";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { orderService } from "../services/orderService";
 
-const CartSidebar = () => {
+const CartSidebar = ({ onTabChange }) => {
   const { cart, updateQty, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "warning" });
-
+  const [dontShowWarning, setDontShowWarning] = useState(() => localStorage.getItem('hideOrderWarning') === 'true');
   const cartItems = Object.values(cart);
+
+  const handleWarningChange = (e) => {
+    setDontShowWarning(e.target.checked);
+    localStorage.setItem('hideOrderWarning', e.target.checked);
+  };
 
   const showSnackbar = (message, severity = "warning") => {
     setSnackbar({ open: true, message, severity });
@@ -41,7 +45,7 @@ const CartSidebar = () => {
             ? `+91${orderData.customerPhone}`
             : user?.phone ? `+91${user.phone}` : "",
         },
-        theme: { color: "#2d68fe" },
+        theme: { color: "#FF6B00" },
         timeout: 1800,
         handler: async function (response) {
           try {
@@ -53,6 +57,7 @@ const CartSidebar = () => {
             if (verifyResult.success) {
               showSnackbar(`Order #${verifyResult.orderId} placed successfully! 🎉`, "success");
               clearCart();
+              if (onTabChange) onTabChange("orders");
             } else {
               showSnackbar("Payment received but verification pending.", "info");
             }
@@ -149,7 +154,7 @@ const CartSidebar = () => {
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#f8f9fa", padding: "4px", borderRadius: "20px", border: "1px solid rgba(0,0,0,0.04)" }}>
                   <button onClick={() => updateQty(itemId, -1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "none", background: "#ffffff", color: "#0f172a", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>−</button>
                   <span style={{ fontSize: "0.9rem", fontWeight: 700, minWidth: "20px", textAlign: "center", color: "#0f172a" }}>{item.qty}</span>
-                  <button onClick={() => updateQty(itemId, 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "none", background: "#2d68fe", color: "#ffffff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                  <button onClick={() => updateQty(itemId, 1)} style={{ width: "24px", height: "24px", borderRadius: "50%", border: "none", background: "#FF6B00", color: "#ffffff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
                 </div>
               </div>
             );
@@ -159,9 +164,59 @@ const CartSidebar = () => {
 
       {/* Footer */}
       <Box sx={{ padding: "1.5rem", background: "#fff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+        {/* ═══ WARNING BLOCK ═══ */}
+        {!dontShowWarning && cartItems.length > 0 && (
+          <Box sx={{ mb: 1.5 }}>
+            <Box sx={{
+              display: "flex", alignItems: "center", gap: 0.75,
+              backgroundColor: "#dc2626", color: "#fff",
+              px: 1.5, py: 0.75,
+              borderRadius: "10px 10px 0 0",
+            }}>
+              <span style={{ fontSize: "1rem" }}>⚠️</span>
+              <span style={{ fontWeight: 800, fontSize: "0.75rem", letterSpacing: 0.5, fontFamily: '"Inter", sans-serif' }}>READ BEFORE YOU PAY</span>
+            </Box>
+            <Box sx={{
+              backgroundColor: "#fef2f2", border: "2px solid #dc2626", borderTop: "none",
+              borderRadius: "0 0 10px 10px", p: 1.25,
+              display: "flex", flexDirection: "column", gap: 0.5,
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                <span style={{ fontSize: "0.9rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                <span style={{ fontSize: "0.75rem", color: "#7f1d1d", lineHeight: 1.4, fontFamily: '"Inter", sans-serif' }}><strong>No modifications</strong> — order cannot be changed</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                <span style={{ fontSize: "0.9rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                <span style={{ fontSize: "0.75rem", color: "#7f1d1d", lineHeight: 1.4, fontFamily: '"Inter", sans-serif' }}><strong>No cancellations</strong> — cannot cancel after payment</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                <span style={{ fontSize: "0.9rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                <span style={{ fontSize: "0.75rem", color: "#7f1d1d", lineHeight: 1.4, fontFamily: '"Inter", sans-serif' }}><strong>No refunds</strong> — under any circumstances</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6, marginTop: 2, paddingTop: 6, borderTop: "1px dashed #fca5a5" }}>
+                <span style={{ fontSize: "0.9rem", lineHeight: 1.3, flexShrink: 0 }}>🕐</span>
+                <span style={{ fontSize: "0.75rem", color: "#7f1d1d", lineHeight: 1.4, fontFamily: '"Inter", sans-serif' }}><strong>Collect on time</strong> — missed pickup? Collect same day before <strong>5:30 PM</strong></span>
+              </div>
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={dontShowWarning}
+                    onChange={handleWarningChange}
+                    sx={{ color: '#dc2626', '&.Mui-checked': { color: '#dc2626' }, p: 0.5, ml: 0.2 }}
+                  />
+                }
+                label={<span style={{ fontSize: "0.7rem", color: "#7f1d1d", fontWeight: 700, fontFamily: '"Inter", sans-serif' }}>I understand, don't show this again</span>}
+                style={{ margin: 0, marginTop: "4px", borderTop: "1px solid rgba(220, 38, 38, 0.1)", paddingTop: "4px" }}
+              />
+            </Box>
+          </Box>
+        )}
+
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", fontSize: "1.1rem", fontWeight: 600 }}>
           <span>Total</span>
-          <span style={{ color: "#2d68fe" }}>₹{totalPrice.toFixed(2)}</span>
+          <span style={{ color: "#FF6B00", fontWeight: 800 }}>₹{totalPrice.toFixed(0)}</span>
         </div>
         <Button
           onClick={processCheckout}
@@ -169,17 +224,17 @@ const CartSidebar = () => {
           fullWidth
           disabled={isCheckingOut || cartItems.length === 0}
           sx={{
-            backgroundColor: "#2d68fe",
+            backgroundColor: "primary.main",
             color: "#ffffff",
             padding: "1rem",
-            borderRadius: "12px",
+            borderRadius: "50px",
             fontSize: "1rem",
-            fontWeight: 700,
+            fontWeight: 800,
             textTransform: "uppercase",
             letterSpacing: "1px",
             fontFamily: '"Inter", sans-serif',
-            boxShadow: "0 4px 14px rgba(45, 104, 254, 0.3)",
-            "&:hover": { backgroundColor: "#2251cd", boxShadow: "0 6px 20px rgba(45, 104, 254, 0.4)" },
+            boxShadow: "0 8px 20px rgba(255,107,0,0.3)",
+            "&:hover": { backgroundColor: "primary.dark", boxShadow: "0 10px 24px rgba(255,107,0,0.4)" },
             "&:disabled": { backgroundColor: "#e2e8f0", boxShadow: "none", color: "#94a3b8" },
           }}
         >

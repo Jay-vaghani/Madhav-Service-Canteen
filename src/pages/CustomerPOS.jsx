@@ -29,12 +29,51 @@ const CustomerPOS = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
 
   useEffect(() => {
-    fetchData();
+    // Initial load with full re-render and spinner
+    fetchData(false);
+
+    let intervalId;
+
+    const startPolling = () => {
+      if (!intervalId) {
+        intervalId = setInterval(() => {
+          fetchData(true); // Silent background fetch
+        }, 5000);
+      }
+    };
+
+    const stopPolling = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        // Immedately fetch when user returns to the tab, then resume polling
+        fetchData(true);
+        startPolling();
+      }
+    };
+
+    // Start polling immediately if the document is visible
+    if (!document.hidden) {
+      startPolling();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
-
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const [itemsResponse, catsResponse] = await Promise.all([
         menuService.getAllMenuItems(),
@@ -48,13 +87,16 @@ const CustomerPOS = () => {
         : catsResponse?.categories || catsResponse?.data || [];
 
       const availableItems = items.filter((item) => item.isAvailable);
+      
+      // We only update if React allows it or if there has been a change, 
+      // but simply setting the new array is fine for React functional components.
       setMenuItems(availableItems);
       setCategories(["all", ...cats]);
     } catch (err) {
-      setError("Failed to load menu. Please try again.");
+      if (!isSilent) setError("Failed to load menu. Please try again.");
       console.error(err);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
@@ -82,7 +124,7 @@ const CustomerPOS = () => {
           backgroundColor: "#f8f9fa",
         }}
       >
-        <CircularProgress size={60} sx={{ color: "#2d68fe" }} />
+        <CircularProgress size={60} sx={{ color: "primary.main" }} />
       </Box>
     );
   }
@@ -164,7 +206,7 @@ const CustomerPOS = () => {
           {/* CART TAB */}
           {activeTab === "cart" && (
             <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", pb: "64px" }}>
-              <CartView />
+              <CartView onTabChange={setActiveTab} />
             </Box>
           )}
 
@@ -216,7 +258,7 @@ const CustomerPOS = () => {
         {/* Content area — shows menu or cart depending on tab */}
         {activeTab === "cart" ? (
           <Box sx={{ flex: 1, overflow: "hidden" }}>
-            <CartView />
+            <CartView onTabChange={setActiveTab} />
           </Box>
         ) : activeTab === "orders" ? (
           <Box sx={{ flex: 1, overflow: "hidden" }}>

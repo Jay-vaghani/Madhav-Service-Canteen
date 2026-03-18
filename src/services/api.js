@@ -16,4 +16,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle session invalidation — auto-logout if admin session was killed remotely
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.code === 'SESSION_INVALIDATED'
+    ) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Full page redirect to clear all React state
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

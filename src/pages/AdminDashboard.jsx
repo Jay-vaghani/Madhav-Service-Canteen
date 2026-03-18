@@ -38,6 +38,7 @@ import { menuService } from "../services/menuService";
 import MenuItemsList from "../components/admin/MenuItemsList";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import OrderManagement from "../components/admin/OrderManagement";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR CONTENT — reused across desktop, tablet, mobile drawer
@@ -217,6 +218,7 @@ const BottomNav = ({ activeSection, setActiveSection, navigate }) => {
     { id: "menu", icon: <RestaurantMenu />, label: "Menu" },
     { id: "orders", icon: <Assignment />, label: "Orders" },
     { id: "users", icon: <People />, label: "Users" },
+    { id: "logout", icon: <LogoutOutlined />, label: "Logout" },
   ];
 
   return (
@@ -241,7 +243,7 @@ const BottomNav = ({ activeSection, setActiveSection, navigate }) => {
         return (
           <Box
             key={id}
-            onClick={() => id === "users" ? navigate("/admin/users") : setActiveSection(id)}
+            onClick={() => id === "users" ? navigate("/admin/users") : id === "logout" ? handleLogout() : setActiveSection(id)}
             sx={{
               flex: 1,
               display: "flex",
@@ -318,7 +320,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => { logout(); navigate("/login"); };
+  const handleLogout = async () => { await logout(); navigate("/login"); };
 
   const handleCreateOrUpdate = async (data) => {
     try {
@@ -383,7 +385,7 @@ const AdminDashboard = () => {
   };
 
   /* ── Menu section content (shared across all breakpoints) ── */
-  const MenuSection = () => (
+  const renderMenuSection = () => (
     <>
       {/* Search + bulk toggle */}
       <Box
@@ -513,7 +515,7 @@ const AdminDashboard = () => {
     </>
   );
 
-  const OrdersSection = () => (
+  const renderOrdersSection = () => (
     <Box sx={{ mb: isMobile ? 10 : 0 }}>
       <OrderManagement isAdmin={true} />
     </Box>
@@ -545,19 +547,20 @@ const AdminDashboard = () => {
               {activeSection === "menu" ? "Menu Items" : activeSection === "orders" ? "Orders" : "Admin"}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             {activeSection === "menu" && (
-              <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem" }}>
-                {availableCount}/{menuItems.length} available
+              <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", display: { xs: 'none', sm: 'block' } }}>
+                {availableCount}/{menuItems.length} avail
               </Typography>
             )}
+            <LanguageSwitcher themeMode="dark" />
           </Box>
         </Box>
 
         {/* Scrollable Content */}
         <Box sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
-          {activeSection === "menu" && <MenuSection />}
-          {activeSection === "orders" && <OrdersSection />}
+          {activeSection === "menu" && renderMenuSection()}
+          {activeSection === "orders" && renderOrdersSection()}
         </Box>
 
         {/* Floating Add button (menu section only) */}
@@ -614,23 +617,26 @@ const AdminDashboard = () => {
                 {activeSection === "menu" ? `${menuItems.length} items · ${availableCount} available` : "Auto-refreshes every 15s"}
               </Typography>
             </Box>
-            {activeSection === "menu" && (
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<Add />}
-                onClick={() => { setEditingItem(null); setFormOpen(true); }}
-                sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", "&:hover": { backgroundColor: "#1d4ed8" } }}
-              >
-                Add
-              </Button>
-            )}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <LanguageSwitcher themeMode="light" />
+              {activeSection === "menu" && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<Add />}
+                  onClick={() => { setEditingItem(null); setFormOpen(true); }}
+                  sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", "&:hover": { backgroundColor: "#1d4ed8" } }}
+                >
+                  Add
+                </Button>
+              )}
+            </Box>
           </Box>
 
           {/* Scrollable body */}
           <Box sx={{ flex: 1, overflowY: "auto", p: 2.5 }}>
-            {activeSection === "menu" && <MenuSection />}
-            {activeSection === "orders" && <OrdersSection />}
+            {activeSection === "menu" && renderMenuSection()}
+            {activeSection === "orders" && renderOrdersSection()}
           </Box>
         </Box>
 
@@ -666,22 +672,25 @@ const AdminDashboard = () => {
                 : "All paid orders · auto-refreshes every 15s"}
             </Typography>
           </Box>
-          {activeSection === "menu" && (
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => { setEditingItem(null); setFormOpen(true); }}
-              sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", boxShadow: "0 4px 14px rgba(37,99,235,0.3)", "&:hover": { backgroundColor: "#1d4ed8" } }}
-            >
-              Add Item
-            </Button>
-          )}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <LanguageSwitcher themeMode="light" />
+            {activeSection === "menu" && (
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => { setEditingItem(null); setFormOpen(true); }}
+                sx={{ textTransform: "none", fontWeight: 700, borderRadius: "10px", backgroundColor: "#2563eb", boxShadow: "0 4px 14px rgba(37,99,235,0.3)", "&:hover": { backgroundColor: "#1d4ed8" } }}
+              >
+                Add Item
+              </Button>
+            )}
+          </Box>
         </Box>
 
         {/* Scrollable body */}
         <Box sx={{ flex: 1, overflowY: "auto", p: 4 }}>
-          {activeSection === "menu" && <MenuSection />}
-          {activeSection === "orders" && <OrdersSection />}
+          {activeSection === "menu" && renderMenuSection()}
+          {activeSection === "orders" && renderOrdersSection()}
         </Box>
       </Box>
 

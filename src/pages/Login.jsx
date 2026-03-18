@@ -36,7 +36,14 @@ const Login = () => {
         navigate("/manager");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed. Please try again.");
+      const status = err.response?.status;
+      const data = err.response?.data;
+
+      if (status === 403 && data?.code === 'DEVICE_LIMIT_REACHED') {
+        setError(data.error);   // "Admin login is already active on 2 devices..."
+      } else {
+        setError(data?.error || "Login failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

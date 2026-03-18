@@ -37,20 +37,22 @@ const CategoryList = ({
             key={categoryId}
             onClick={() => onCategoryChange(categoryId)}
             style={{
-              padding: "0.6rem 1.25rem",
+              padding: "0.6rem 1.4rem",
               borderRadius: "50px",
               border: isActive
-                ? "1px solid #2d68fe"
-                : "1px solid rgba(0, 0, 0, 0.08)",
-              background: isActive ? "#2d68fe" : "#ffffff",
-              color: isActive ? "#ffffff" : "#0f172a",
-              fontWeight: isActive ? 600 : 500,
+                ? "1px solid #FF6B00"
+                : "1px solid rgba(0, 0, 0, 0.05)",
+              background: isActive ? "#FF6B00" : "#ffffff",
+              color: isActive ? "#ffffff" : "#0F172A",
+              fontWeight: isActive ? 800 : 600,
               whiteSpace: "nowrap",
               cursor: "pointer",
-              transition: "all 0.2s ease",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
               fontSize: "0.9rem",
               fontFamily: '"Inter", sans-serif',
-              boxShadow: isActive ? "0 4px 12px rgba(45, 104, 254, 0.2)" : "none",
+              letterSpacing: isActive ? "0.02em" : "0",
+              boxShadow: isActive ? "0 8px 20px rgba(255, 107, 0, 0.25)" : "0 2px 6px rgba(0,0,0,0.03)",
+              transform: isActive ? "scale(1.02)" : "scale(1)",
             }}
           >
             {categoryLabel}

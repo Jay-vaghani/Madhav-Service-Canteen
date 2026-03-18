@@ -72,9 +72,9 @@ const BottomTabBar = ({ activeTab, onTabChange }) => {
                             >
                                 <Icon
                                     sx={{
-                                        fontSize: 24,
-                                        color: isActive ? "#2d68fe" : "#94a3b8",
-                                        transition: "color 0.18s ease",
+                                        fontSize: isActive ? 26 : 24,
+                                        color: isActive ? "primary.main" : "text.secondary",
+                                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                                     }}
                                 />
                             </Badge>
@@ -84,9 +84,10 @@ const BottomTabBar = ({ activeTab, onTabChange }) => {
                                     fontSize: "0.65rem",
                                     fontWeight: isActive ? 700 : 500,
                                     fontFamily: '"Inter", sans-serif',
-                                    color: isActive ? "#2d68fe" : "#94a3b8",
-                                    transition: "all 0.18s ease",
-                                    letterSpacing: "0.2px",
+                                    color: isActive ? "primary.main" : "text.secondary",
+                                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                    letterSpacing: "0.02em",
+                                    mt: isActive ? 0.2 : 0,
                                 }}
                             >
                                 {tab.label}
@@ -129,12 +130,12 @@ const BottomTabBar = ({ activeTab, onTabChange }) => {
                             width: 56,
                             py: 1,
                             cursor: "pointer",
-                            borderRadius: "14px",
-                            backgroundColor: isActive ? "rgba(45, 104, 254, 0.08)" : "transparent",
-                            transition: "all 0.18s ease",
+                            borderRadius: "16px",
+                            backgroundColor: isActive ? "primary.light" : "transparent",
+                            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                             "&:hover": {
                                 backgroundColor: isActive
-                                    ? "rgba(45, 104, 254, 0.12)"
+                                    ? "primary.light"
                                     : "rgba(0,0,0,0.04)",
                             },
                         }}
@@ -153,9 +154,9 @@ const BottomTabBar = ({ activeTab, onTabChange }) => {
                         >
                             <Icon
                                 sx={{
-                                    fontSize: 22,
-                                    color: isActive ? "#2d68fe" : "#94a3b8",
-                                    transition: "color 0.18s ease",
+                                    fontSize: isActive ? 24 : 22,
+                                    color: isActive ? "primary.main" : "text.secondary",
+                                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                                 }}
                             />
                         </Badge>
@@ -165,10 +166,11 @@ const BottomTabBar = ({ activeTab, onTabChange }) => {
                                 fontSize: "0.6rem",
                                 fontWeight: isActive ? 700 : 500,
                                 fontFamily: '"Inter", sans-serif',
-                                color: isActive ? "#2d68fe" : "#94a3b8",
-                                transition: "all 0.18s ease",
+                                color: isActive ? "primary.main" : "text.secondary",
+                                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                                 textAlign: "center",
-                                letterSpacing: "0.2px",
+                                letterSpacing: "0.02em",
+                                mt: isActive ? 0.2 : 0,
                             }}
                         >
                             {tab.label}

@@ -30,22 +30,24 @@ const ItemCard = ({ item }) => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: "14px",
+          borderRadius: "20px",
           overflow: "hidden",
-          border: "1px solid rgba(0, 0, 0, 0.07)",
+          border: "1px solid rgba(0, 0, 0, 0.04)",
           background: "#ffffff",
           display: "flex",
           flexDirection: "column",
-          transition: "all 0.2s ease",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           height: "100%",
           position: "relative",
           cursor: "pointer",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
           "&:hover": {
-            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
-            transform: "translateY(-2px)",
+            boxShadow: "0 14px 28px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0,0,0,0.03)",
+            transform: "translateY(-4px)",
+            borderColor: "rgba(255, 107, 0, 0.2)",
           },
           "&:active": {
-            transform: "translateY(0)",
+            transform: "scale(0.97)",
           },
         }}
         onClick={() => addToCart(item)}
@@ -62,11 +64,11 @@ const ItemCard = ({ item }) => {
             src={item.imageUrl || item.image}
             alt={item.name || item.title}
             sx={{
-              height: { xs: 110, sm: 140, md: 160 },
+              aspectRatio: "4/3",
               width: "100%",
               objectFit: "cover",
               display: "block",
-              backgroundColor: "#f1f5f9",
+              backgroundColor: "#f8fafc",
             }}
           />
           {/* Info button (mobile: top-right corner of image) */}
@@ -78,30 +80,34 @@ const ItemCard = ({ item }) => {
             }}
             sx={{
               position: "absolute",
-              top: 6,
-              right: 6,
+              top: 8,
+              right: 8,
               backgroundColor: "rgba(255,255,255,0.85)",
-              backdropFilter: "blur(4px)",
-              width: 26,
-              height: 26,
+              backdropFilter: "blur(8px)",
+              width: 28,
+              height: 28,
               "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.95)",
+                backgroundColor: "primary.main",
+                color: "#fff",
               },
+              "&:hover .MuiSvgIcon-root": {
+                color: "#fff",
+              }
             }}
           >
-            <InfoOutlinedIcon sx={{ fontSize: 15, color: "#2d68fe" }} />
+            <InfoOutlinedIcon sx={{ fontSize: 16, color: "text.secondary", transition: "color 0.2s" }} />
           </IconButton>
         </Box>
 
         {/* CONTENT */}
         <Box
           sx={{
-            padding: { xs: "0.5rem 0.6rem 0.6rem", sm: "0.75rem 0.875rem 0.875rem" },
+            padding: { xs: "0.6rem 0.75rem", sm: "1rem" },
             flex: 1,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            gap: "0.35rem",
+            gap: "0.5rem",
           }}
         >
           {/* Item Name */}
@@ -109,11 +115,11 @@ const ItemCard = ({ item }) => {
             component="h3"
             sx={{
               fontFamily: '"Inter", sans-serif',
-              fontSize: { xs: "0.82rem", sm: "0.95rem", md: "1.05rem" },
-              fontWeight: 700,
+              fontSize: { xs: "0.85rem", sm: "1rem", md: "1.05rem" },
+              fontWeight: 800,
               margin: 0,
-              color: "#0f172a",
-              lineHeight: 1.25,
+              color: "text.primary",
+              lineHeight: 1.3,
               overflow: "hidden",
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -136,8 +142,8 @@ const ItemCard = ({ item }) => {
               component="span"
               sx={{
                 fontWeight: 800,
-                color: "#0f172a",
-                fontSize: { xs: "0.875rem", sm: "1rem" },
+                color: "text.primary",
+                fontSize: { xs: "0.95rem", sm: "1.1rem" },
                 fontFamily: '"Inter", sans-serif',
               }}
             >
@@ -146,20 +152,26 @@ const ItemCard = ({ item }) => {
             <IconButton
               size="small"
               sx={{
-                backgroundColor: "#2d68fe",
+                backgroundColor: "primary.main",
                 color: "#ffffff",
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 },
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 },
+                boxShadow: "0 4px 12px rgba(255,107,0,0.3)",
                 "&:hover": {
-                  backgroundColor: "#2251cd",
+                  backgroundColor: "primary.dark",
+                  transform: "scale(1.05)",
                 },
+                "&:active": {
+                  transform: "scale(0.95)",
+                },
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
               onClick={(e) => {
                 e.stopPropagation();
                 addToCart(item);
               }}
             >
-              <AddIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+              <AddIcon sx={{ fontSize: { xs: 18, sm: 20 }, strokeWidth: 1.5 }} />
             </IconButton>
           </Box>
         </Box>
@@ -173,8 +185,9 @@ const ItemCard = ({ item }) => {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: "16px",
+            borderRadius: "24px",
             overflow: "hidden",
+            margin: "16px",
           },
         }}
       >
@@ -184,49 +197,55 @@ const ItemCard = ({ item }) => {
           alt={item.name}
           sx={{
             width: "100%",
-            height: 200,
+            aspectRatio: "4/3",
             objectFit: "cover",
+            backgroundColor: "#f8fafc",
           }}
         />
         <IconButton
           onClick={() => setInfoOpen(false)}
           sx={{
             position: "absolute",
-            top: 8,
-            right: 8,
-            backgroundColor: "rgba(0,0,0,0.4)",
+            top: 12,
+            right: 12,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(8px)",
             color: "#fff",
             width: 32,
             height: 32,
-            "&:hover": { backgroundColor: "rgba(0,0,0,0.6)" },
+            "&:hover": { backgroundColor: "rgba(0,0,0,0.8)", transform: "scale(1.05)" },
+            transition: "all 0.2s",
           }}
         >
           <CloseIcon sx={{ fontSize: 18 }} />
         </IconButton>
-        <DialogContent sx={{ pt: 2, pb: 1 }}>
+        <DialogContent sx={{ pt: 2.5, pb: 2, px: 3 }}>
           <Typography
-            variant="h6"
+            variant="h5"
             fontWeight={800}
             fontFamily='"Inter", sans-serif'
-            color="#0f172a"
+            color="text.primary"
+            lineHeight={1.3}
+            mb={1}
             gutterBottom
           >
             {item.name}
           </Typography>
           {categories.length > 0 && (
-            <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mb: 1.5 }}>
+            <Box sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", mb: 2 }}>
               {categories.map((cat, idx) => (
                 <Chip
                   key={idx}
                   label={cat}
                   size="small"
                   sx={{
-                    fontSize: "0.7rem",
-                    backgroundColor: "rgba(45, 104, 254, 0.1)",
-                    color: "#2d68fe",
-                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    backgroundColor: "primary.light",
+                    color: "primary.dark",
+                    fontWeight: 700,
                     textTransform: "capitalize",
-                    borderRadius: "6px",
+                    borderRadius: "8px",
+                    px: 0.5,
                   }}
                 />
               ))}
@@ -236,9 +255,10 @@ const ItemCard = ({ item }) => {
             variant="body2"
             color="text.secondary"
             lineHeight={1.6}
-            mb={2}
+            fontSize="0.95rem"
+            mb={3}
           >
-            {item.description || "No description available."}
+            {item.description || "No description available for this item."}
           </Typography>
           <Box
             sx={{
@@ -249,11 +269,11 @@ const ItemCard = ({ item }) => {
           >
             <Typography
               fontWeight={800}
-              fontSize="1.2rem"
+              fontSize="1.3rem"
               fontFamily='"Inter", sans-serif'
-              color="#0f172a"
+              color="text.primary"
             >
-              ₹{(item.price || 0).toFixed(2)}
+              ₹{(item.price || 0).toFixed(0)}
             </Typography>
             <Button
               variant="contained"
@@ -263,12 +283,13 @@ const ItemCard = ({ item }) => {
                 setInfoOpen(false);
               }}
               sx={{
-                borderRadius: "10px",
+                borderRadius: "50px",
                 textTransform: "none",
-                fontWeight: 700,
-                backgroundColor: "#2d68fe",
-                "&:hover": { backgroundColor: "#2251cd" },
-                px: 3,
+                fontWeight: 800,
+                fontSize: "0.95rem",
+                px: 3.5,
+                py: 1.2,
+                boxShadow: "0 8px 20px rgba(255,107,0,0.3)",
               }}
             >
               Add to Order

@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { orderService } from "../services/orderService";
 import { useState } from "react";
 
-const CartView = () => {
+const CartView = ({ onTabChange }) => {
     const { cart, updateQty, totalPrice, clearCart } = useCart();
     const { user } = useAuth();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -47,7 +47,7 @@ const CartView = () => {
                         ? `+91${orderData.customerPhone}`
                         : user?.phone ? `+91${user.phone}` : "",
                 },
-                theme: { color: "#2d68fe" },
+                theme: { color: "#FF6B00" },
                 timeout: 1800,
                 handler: async function (response) {
                     try {
@@ -59,6 +59,7 @@ const CartView = () => {
                         if (verifyResult.success) {
                             showSnackbar(`Order #${verifyResult.orderId} placed! 🎉`, "success");
                             clearCart();
+                            if (onTabChange) onTabChange("orders");
                         } else {
                             showSnackbar("Payment received, verification pending.", "info");
                         }
@@ -132,8 +133,9 @@ const CartView = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     backgroundColor: "#ffffff",
-                                    borderRadius: "14px",
-                                    border: "1px solid rgba(0,0,0,0.06)",
+                                    borderRadius: "16px",
+                                    border: "1px solid rgba(0,0,0,0.04)",
+                                    boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
                                     p: 1.5,
                                     mb: 1.5,
                                     gap: 1.5,
@@ -143,7 +145,7 @@ const CartView = () => {
                                     component="img"
                                     src={itemImage}
                                     alt={itemName}
-                                    sx={{ width: 52, height: 52, borderRadius: "10px", objectFit: "cover", flexShrink: 0, backgroundColor: "#f1f5f9" }}
+                                    sx={{ width: 64, height: 64, borderRadius: "12px", objectFit: "cover", flexShrink: 0, backgroundColor: "#f8fafc" }}
                                 />
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Typography
@@ -155,26 +157,26 @@ const CartView = () => {
                                     >
                                         {itemName}
                                     </Typography>
-                                    <Typography fontFamily='"Inter", sans-serif' fontWeight={700} fontSize="0.85rem" color="#2d68fe">
-                                        ₹{(item.price * item.qty).toFixed(2)}
+                                    <Typography fontFamily='"Inter", sans-serif' fontWeight={800} fontSize="0.95rem" color="primary.main">
+                                        ₹{(item.price * item.qty).toFixed(0)}
                                     </Typography>
                                 </Box>
                                 {/* Qty controls */}
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, backgroundColor: "#f8f9fa", borderRadius: "20px", border: "1px solid rgba(0,0,0,0.06)", px: 0.75, py: 0.5 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, backgroundColor: "primary.light", borderRadius: "50px", border: "1px solid rgba(255,107,0,0.1)", px: 0.5, py: 0.5 }}>
                                     <Box
                                         component="button"
                                         onClick={() => updateQty(itemId, -1)}
-                                        sx={{ width: 26, height: 26, borderRadius: "50%", border: "none", background: "#ffffff", color: "#0f172a", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}
+                                        sx={{ width: 28, height: 28, borderRadius: "50%", border: "none", background: "#ffffff", color: "primary.dark", fontSize: "1.2rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", transition: "all 0.2s", "&:hover": { transform: "scale(1.05)" }, "&:active": { transform: "scale(0.95)" } }}
                                     >
                                         −
                                     </Box>
-                                    <Typography fontWeight={700} fontSize="0.9rem" color="#0f172a" sx={{ minWidth: 20, textAlign: "center" }}>
+                                    <Typography fontWeight={800} fontSize="0.95rem" color="text.primary" sx={{ minWidth: 20, textAlign: "center", fontFamily: '"Inter", sans-serif' }}>
                                         {item.qty}
                                     </Typography>
                                     <Box
                                         component="button"
                                         onClick={() => updateQty(itemId, 1)}
-                                        sx={{ width: 26, height: 26, borderRadius: "50%", border: "none", background: "#2d68fe", color: "#ffffff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                        sx={{ width: 28, height: 28, borderRadius: "50%", border: "none", background: "primary.main", color: "#ffffff", fontSize: "1.2rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(255,107,0,0.2)", transition: "all 0.2s", "&:hover": { background: "primary.dark", transform: "scale(1.05)" }, "&:active": { transform: "scale(0.95)" } }}
                                     >
                                         +
                                     </Box>
@@ -187,33 +189,95 @@ const CartView = () => {
 
             {/* Footer */}
             <Box sx={{ p: 2, backgroundColor: "#ffffff", borderTop: "1px solid rgba(0,0,0,0.05)" }}>
-                {/* Notice Block */}
+                {/* ═══ WARNING BLOCK ═══ */}
                 {!dontShowWarning && cartItems.length > 0 && (
-                    <Box sx={{ mb: 2, p: 1.5, backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fde68a" }}>
-                        <Typography fontSize="0.85rem" color="#92400e" fontFamily='"Inter", sans-serif' fontWeight={700} mb={0.5} display="flex" alignItems="center" gap={0.5}>
-                            <span style={{ fontSize: "1rem" }}>⚠️</span> Important Notice
-                        </Typography>
-                        <Typography fontSize="0.75rem" color="#92400e" fontFamily='"Inter", sans-serif' mb={1} lineHeight={1.4}>
-                            Once your order is placed, <strong>modifications</strong> and <strong>cancellations</strong> are not permitted. Please review your items carefully.
-                        </Typography>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    size="small"
-                                    checked={dontShowWarning}
-                                    onChange={handleWarningChange}
-                                    sx={{ color: '#d97706', '&.Mui-checked': { color: '#d97706' }, p: 0.5, py: 0 }}
-                                />
-                            }
-                            label={<Typography fontSize="0.75rem" color="#92400e" fontFamily='"Inter", sans-serif' fontWeight={600}>Don't show this again</Typography>}
-                            sx={{ m: 0 }}
-                        />
+                    <Box sx={{ mb: 2 }}>
+                        {/* Danger header */}
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.75,
+                            backgroundColor: "#dc2626",
+                            color: "#fff",
+                            px: 1.5,
+                            py: 1,
+                            borderRadius: "10px 10px 0 0",
+                        }}>
+                            <span style={{ fontSize: "1.1rem" }}>⚠️</span>
+                            <Typography fontFamily='"Inter", sans-serif' fontWeight={800} fontSize="0.8rem" letterSpacing={0.5}>
+                                READ BEFORE YOU PAY
+                            </Typography>
+                        </Box>
+
+                        {/* Warning cards */}
+                        <Box sx={{
+                            backgroundColor: "#fef2f2",
+                            border: "2px solid #dc2626",
+                            borderTop: "none",
+                            borderRadius: "0 0 10px 10px",
+                            p: 1.25,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.75,
+                        }}>
+                            {/* Warning 1 — No modifications */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75 }}>
+                                <span style={{ fontSize: "1rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                                <Typography fontFamily='"Inter", sans-serif' fontSize="0.78rem" color="#7f1d1d" lineHeight={1.4}>
+                                    <strong>No modifications</strong> — once placed, your order cannot be changed
+                                </Typography>
+                            </Box>
+
+                            {/* Warning 2 — No cancellations */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75 }}>
+                                <span style={{ fontSize: "1rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                                <Typography fontFamily='"Inter", sans-serif' fontSize="0.78rem" color="#7f1d1d" lineHeight={1.4}>
+                                    <strong>No cancellations</strong> — orders cannot be cancelled after payment
+                                </Typography>
+                            </Box>
+
+                            {/* Warning 3 — No refunds */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75 }}>
+                                <span style={{ fontSize: "1rem", lineHeight: 1.3, flexShrink: 0 }}>❌</span>
+                                <Typography fontFamily='"Inter", sans-serif' fontSize="0.78rem" color="#7f1d1d" lineHeight={1.4}>
+                                    <strong>No refunds</strong> — refunds are not provided under any circumstances
+                                </Typography>
+                            </Box>
+
+                            {/* Warning 4 — Collection timing */}
+                            <Box sx={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 0.75,
+                                mt: 0.25,
+                                pt: 0.75,
+                                borderTop: "1px dashed #fca5a5",
+                            }}>
+                                <span style={{ fontSize: "1rem", lineHeight: 1.3, flexShrink: 0 }}>🕐</span>
+                                <Typography fontFamily='"Inter", sans-serif' fontSize="0.78rem" color="#7f1d1d" lineHeight={1.4}>
+                                    <strong>Collect on time</strong> — if you miss the 30-minute pickup, you must collect the same day before <strong>5:30 PM</strong> (Canteen: 7:30 AM – 5:30 PM)
+                                </Typography>
+                            </Box>
+
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        size="small"
+                                        checked={dontShowWarning}
+                                        onChange={handleWarningChange}
+                                        sx={{ color: '#dc2626', '&.Mui-checked': { color: '#dc2626' }, p: 0.5, ml: 0.5 }}
+                                    />
+                                }
+                                label={<Typography fontSize="0.75rem" color="#7f1d1d" fontFamily='"Inter", sans-serif' fontWeight={700}>I understand, don't show this again</Typography>}
+                                sx={{ m: 0, mt: 0.5, borderTop: "1px solid rgba(220, 38, 38, 0.1)", pt: 0.5 }}
+                            />
+                        </Box>
                     </Box>
                 )}
 
                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
                     <Typography fontFamily='"Inter", sans-serif' fontWeight={600} fontSize="1rem" color="#0f172a">Total</Typography>
-                    <Typography fontFamily='"Inter", sans-serif' fontWeight={800} fontSize="1.1rem" color="#2d68fe">₹{totalPrice.toFixed(2)}</Typography>
+                    <Typography fontFamily='"Inter", sans-serif' fontWeight={800} fontSize="1.2rem" color="primary.main">₹{totalPrice.toFixed(0)}</Typography>
                 </Box>
                 <Button
                     onClick={processCheckout}
@@ -221,17 +285,17 @@ const CartView = () => {
                     fullWidth
                     disabled={isCheckingOut || cartItems.length === 0}
                     sx={{
-                        backgroundColor: "#2d68fe",
+                        backgroundColor: "primary.main",
                         color: "#ffffff",
                         py: 1.5,
-                        borderRadius: "12px",
+                        borderRadius: "50px",
                         fontSize: "1rem",
-                        fontWeight: 700,
+                        fontWeight: 800,
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         fontFamily: '"Inter", sans-serif',
-                        boxShadow: "0 4px 14px rgba(45, 104, 254, 0.3)",
-                        "&:hover": { backgroundColor: "#2251cd", boxShadow: "0 6px 20px rgba(45, 104, 254, 0.4)" },
+                        boxShadow: "0 8px 20px rgba(255,107,0,0.3)",
+                        "&:hover": { backgroundColor: "primary.dark", boxShadow: "0 10px 24px rgba(255,107,0,0.4)" },
                         "&:disabled": { backgroundColor: "#e2e8f0", boxShadow: "none", color: "#94a3b8" },
                     }}
                 >
